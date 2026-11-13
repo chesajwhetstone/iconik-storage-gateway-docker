@@ -13,8 +13,10 @@ RUN apt-get update && apt-get install -y wget gnupg && \
     apt-get update && \
     apt-get install -y iconik-storage-gateway
 VOLUME /var/iconik/iconik_storage_gateway/data
-CMD /opt/iconik/iconik_storage_gateway/iconik_storage_gateway \
-    --iconik-url=${ICONIK_URL:-https://app-lb.iconik.io/} \
-    --auth-token=${AUTH_TOKEN} \
-    --app-id=${APP_ID} \
-    --storage-id=${STORAGE_ID}
+CMD set -e; \
+    [ -n "${AUTH_TOKEN_FILE:-}" ] && AUTH_TOKEN="$(cat "$AUTH_TOKEN_FILE")"; \
+    exec /opt/iconik/iconik_storage_gateway/iconik_storage_gateway \
+    --iconik-url="${ICONIK_URL:-https://app-lb.iconik.io/}" \
+    --auth-token="${AUTH_TOKEN}" \
+    --app-id="${APP_ID}" \
+    --storage-id="${STORAGE_ID}"
