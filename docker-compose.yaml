@@ -1,22 +1,33 @@
 # This docker-compose file contains an example on how to build and run an ISG
+# This does not map the ISG data volume to the docker host. It is kept locally as a docker volume only.
 
 version: '2.4'
+
+volumes:
+  isg_local_data:
+
+secrets:
+  iconik_auth_token:
+    external: true
 
 services:
   isg:
     environment:
-      - ICONIK_URL
-      - AUTH_TOKEN
-      - APP_ID
-      - STORAGE_ID
+      ICONIK_URL:
+      AUTH_TOKEN_FILE: /run/secrets/iconik_auth_token
+      APP_ID:
+      STORAGE_ID:
     build:
       context: .
       # Uncomment the following lines to build an image with a development ISG
       #args:
       #  REPO_BASE: https://packages.iconik.io/dev/deb/ubuntu
+    secrets:
+      - iconik_auth_token
     volumes:
       # This is the ISG data directory where the local database is kept.
-      - ./isg_local_data:/var/iconik/iconik_storage_gateway/data
+      - isg_local_data:/var/iconik/iconik_storage_gateway/data
+  
 
       # Uncomment the following line to map a media volume into the ISG container
       #- /Volumes/example:/Volumes/example
