@@ -28,25 +28,32 @@ for the ISG local database. It is important to mount it as an external
 volume in order to make local database persistent.
 
 
-# docker-compose
+# Docker Swarm
 
-You can also use docker compose to manage the ISG.
-We have provided an example docker-compose.yaml file which can be used as a base for your configuration.
-You will need to configure a storage volume in the docker-compose.yaml file to map your storage into the container,
-and also add your app-id, auth-token and storage-id to the file .env
+You can also use docker swarm to manage the ISG.
+We have provided an example docker-compose.yaml file which can be used as a stack file for your configuration.
+
+You don't need to configure a data volume for the ISG data as it will be a named docker volume in the swarm.
+You will need to create a docker secret for your iconik auth token, and also add your app-id, auth-token and storage-id to the file .env
+
+First create the docker secret for your iconik auth token:
+
+```
+printf "<auth_token>" | docker secret create iconik_auth_token -
+```
 
 After configuring this you can bring up the ISG with the command
 
 ```
-docker compose up -d
+docker stack deploy --compose-file docker-compose.yml isg
 ```
 
-This will start the ISG process in a detached container.
+This will start the ISG as a service in the swarm.
 
 You can view the logs with the command
 
 ```
-docker compose logs -f isg
+docker service logs -f -t --tail 100 isg_isg
 ```
 
 # Development
